@@ -132,19 +132,24 @@ describe('nsfw-filesystem-watcher', function (): void {
             FileUri.fsPath(file_txt),
             'random content\n'
         );
-        await sleep(1000);
+        await sleep(2000);
         await fs.promises.rename(
             FileUri.fsPath(file_txt),
             FileUri.fsPath(FILE_txt)
         );
-        await sleep(1000);
-        expect(changes).deep.eq([
-            // initial file creation change event:
-            { type: FileChangeType.ADDED, uri: file_txt.toString() },
-            // rename change events:
-            { type: FileChangeType.DELETED, uri: file_txt.toString() },
-            { type: FileChangeType.ADDED, uri: FILE_txt.toString() }
-        ]);
+        await sleep(2000);
+        try {
+            expect(changes).deep.eq([
+                // initial file creation change event:
+                { type: FileChangeType.ADDED, uri: file_txt.toString() },
+                // rename change events:
+                { type: FileChangeType.DELETED, uri: file_txt.toString() },
+                { type: FileChangeType.ADDED, uri: FILE_txt.toString() }
+            ]);
+        } catch (error) {
+            console.error('DEBUG:', changes);
+            throw error;
+        }
     });
 
     function createNsfwFileSystemWatcherService(): NsfwFileSystemWatcherService {
